@@ -7,7 +7,7 @@ recoding between ISCO-08, ISCO-88, and ISCO-68 or generating prestige scores
 and occupational classes are supported. A command to label ISCO codes is
 also provided (`iscolbl`).
 
-`iscogen` uses an indexing approach to transform the ISCO codes and is thus
+`iscogen` uses an indexing approach to translate the ISCO codes and is thus
 fast also in very large datasets.
 
 To install the `iscogen` package, type
