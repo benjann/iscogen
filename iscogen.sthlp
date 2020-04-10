@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.1  26jul2019  Ben Jann}{...}
+{* *! version 1.0.2  10apr2020  Ben Jann}{...}
 {vieweralsosee "[D] generate" "help generate"}{...}
 {vieweralsosee "[D] label" "help label"}{...}
 {viewerjumpto "Syntax" "iscogen##syntax"}{...}
@@ -111,6 +111,7 @@
 {p2col:ISCO-88 ->}SIOPS (Standard International Occupational Prestige Scale; Treiman 1977){p_end}
 {p2col:ISCO-88 ->}MPS (German Magnitude Prestige Scale; Christoph 2005){p_end}
 {p2col:ISCO-88 ->}EGP classes (Erikson et al. 1979, 1983){p_end}
+{p2col:ISCO-88 ->}ESEC (European Socio-economic Classification; Harrison/Rose 2006){p_end}
 {p2col:ISCO-88 ->}OESCH classes (16, 8 or 5 classes; Oesch 2006a,b){p_end}
 
 {p2col:ISCO-68 ->}ISCO-08{p_end}
@@ -286,7 +287,9 @@
     information on the ESEC classification also see
     {browse "http://www.iser.essex.ac.uk/archives/esec"}. Note that ESEC is defined
     at the level of minor groups (3 digit) (i.e. all unit groups within a minor group
-    map into the same class).
+    map into the same class). ISCO minor groups 960, 961, and 962 are missing in the ESEC 
+    list provided in {bf:esec_08_3_digit_public.xlsx}; {cmd:iscogen} uses the same ESEC values for
+    them as for minor group 950, 951, and 952.
 
 {phang}
     ISCO-08  ->  OESCH
@@ -381,6 +384,16 @@
     {cmd:egp11()} distinguishes between classes IIIa and IIIb whereas
     {cmd:egp()} makes no such distinction; also note that different numeric codes
     are used for classes IVa and IVb.
+
+{phang}
+    ISCO-88  ->  ESEC
+    {p_end}
+{pmore}
+    File {bf:{browse "http://www.iser.essex.ac.uk/files/esec/nsi/matrices/Euroesec%20matrix.xls":Euroesec matrix.xls}}
+    from
+    {browse "http://www.iser.essex.ac.uk/archives/esec"}. Note that ESEC is defined
+    at the level of minor groups (3 digit) (i.e. all unit groups within a minor group
+    map into the same class).
 
 {phang}
     ISCO-88  ->  OESCH

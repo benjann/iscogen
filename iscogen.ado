@@ -1,4 +1,4 @@
-*! version 1.0.1  26jul2019  Ben Jann
+*! version 1.0.3  10apr2020  Ben Jann
 
 program iscogen
     version 13
@@ -8884,6 +8884,161 @@ exit
 9333 9 9 9 9 9 9 9 9
 % END
 
+% CODELIST-isco88-esec
+% source: Euroesec matrix.xls obtained on 10apr2020 from 
+%         https://www.iser.essex.ac.uk/archives/esec/matrices-and-syntax
+% variables: ISCO-08(3 digit) ESEC(employee) ESEC(supervisor)
+%            ESEC(selfemp 0-9 employees) ESEC(selfemp 10+ employees)
+010 1 1 1 1
+011 3 2 3 3
+100 1 1 4 1
+110 1 1 1 1
+111 1 1 1 1
+114 1 1 1 1
+120 1 1 4 1
+121 1 1 4 1
+122 2 2 4 1
+123 1 1 4 1
+130 2 2 4 1
+131 2 2 4 1
+200 1 1 1 1
+210 1 1 1 1
+211 1 1 1 1
+212 1 1 1 1
+213 1 1 1 1
+214 1 1 1 1
+220 1 1 1 1
+221 1 1 1 1
+222 1 1 1 1
+223 2 2 2 1
+230 2 2 2 1
+231 1 1 1 1
+232 2 2 2 1
+233 2 2 2 1
+234 2 2 2 1
+235 1 1 1 1
+240 1 1 1 1
+241 1 1 1 1
+242 1 1 1 1
+243 2 2 2 1
+244 2 2 2 1
+245 2 2 2 1
+246 2 2 2 1
+247 2 2 2 1
+300 3 2 4 1
+310 2 2 2 1
+311 2 2 2 1
+312 2 2 2 1
+313 6 2 4 1
+314 2 2 2 1
+315 6 6 4 1
+320 2 2 2 1
+321 2 2 2 1
+322 2 2 2 1
+323 2 2 2 1
+330 3 2 4 1
+331 3 2 4 1
+332 3 2 4 1
+333 3 2 4 1
+334 2 2 2 1
+340 3 2 4 1
+341 3 2 4 1
+342 2 2 2 1
+343 3 2 4 1
+344 2 2 2 2
+345 2 2 2 2
+346 3 2 4 1
+347 3 2 4 1
+348 2 2 2 1
+400 3 2 4 1
+410 3 2 4 1
+411 3 2 4 1
+412 3 2 4 1
+413 7 6 4 1
+414 9 6 4 1
+419 3 2 4 1
+420 3 2 4 1
+421 7 6 4 1
+422 7 6 4 1
+500 7 6 4 1
+510 7 6 4 1
+511 7 6 4 1
+512 9 6 4 1
+513 7 6 4 1
+514 7 6 4 1
+516 7 6 3 3
+520 7 6 4 1
+521 2 2 4 1
+522 7 6 4 1
+600 8 6 5 1
+610 8 6 5 1
+611 8 6 5 1
+612 8 6 5 1
+613 8 6 5 1
+614 8 6 5 1
+615 8 6 5 1
+621 5 5 5 5
+700 8 6 4 1
+710 8 6 4 1
+711 8 6 4 1
+712 8 6 4 1
+713 8 6 4 1
+714 8 6 4 1
+720 8 6 4 1
+721 8 6 4 1
+722 8 6 4 1
+723 8 6 4 1
+724 8 6 4 1
+730 6 6 4 1
+731 6 6 4 1
+732 8 6 4 1
+733 8 6 4 1
+734 8 6 4 1
+740 8 6 4 1
+741 8 6 4 1
+742 8 6 4 1
+743 8 6 4 1
+744 8 6 4 1
+800 9 6 4 1
+810 9 6 4 1
+811 9 6 4 1
+812 9 6 4 1
+813 9 6 4 1
+814 9 6 4 1
+815 9 6 4 1
+816 9 6 4 1
+817 9 6 4 1
+820 9 6 4 1
+821 9 6 4 1
+822 9 6 4 1
+823 9 6 4 1
+824 9 6 4 1
+825 8 6 4 1
+826 9 6 4 1
+827 9 6 4 1
+828 9 6 4 1
+829 9 6 4 1
+830 9 6 4 1
+831 8 6 4 1
+832 9 6 4 1
+833 9 6 4 1
+834 8 6 4 1
+900 9 6 4 1
+910 9 6 4 1
+911 7 6 4 1
+912 9 6 4 1
+913 9 6 4 1
+914 9 6 4 1
+915 9 6 4 1
+916 9 6 4 1
+920 9 6 5 1
+921 9 6 5 1
+930 9 6 4 1
+931 9 6 4 1
+932 9 6 4 1
+933 9 6 4 1
+% END
+
 % CODELIST-isco88-oesch
 % source: iskooesch.ado (May 2018) by Simon Kaiser
 % note: the codelist has been generated automatically by applying iskooesch.ado
@@ -11226,6 +11381,9 @@ exit
 % CODELIST-isco08-esec
 % source: esec_08_3_digit_public.xlsx obtained on 27jun2019 from 
 %         https://ekharrison.weebly.com/european-socio-economic-classification-esec.html
+% note: codes 960/961/962 are not covered in the 3-digit list in esec_08_3_digit_public.xlsx; 
+%       however, from the 2-digit list (also in esec_08_3_digit_public.xlsx) we see
+%       that we can treat these codes in the same way as 950/951/952
 % variables: ISCO-08(3 digit) ESEC(employee) ESEC(supervisor)
 %            ESEC(selfemp 0-9 employees) ESEC(selfemp 10+ employees)
 011 1 1 1 1
@@ -11404,6 +11562,9 @@ exit
 950 9 6 4 1
 951 9 6 4 1
 952 9 6 4 1
+960 9 6 4 1     (see note above)
+961 9 6 4 1     (see note above)
+962 9 6 4 1     (see note above)
 % END
 
 % CODELIST-isco08-oesch
