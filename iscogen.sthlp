@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.2  10apr2020  Ben Jann}{...}
+{* *! version 1.0.3  12apr2020  Ben Jann}{...}
 {vieweralsosee "[D] generate" "help generate"}{...}
 {vieweralsosee "[D] label" "help label"}{...}
 {viewerjumpto "Syntax" "iscogen##syntax"}{...}
@@ -129,27 +129,58 @@
     for example, 1000.5 will be treated as 1000).
 
 {pstd}
-    With {cmd:egp()}, {cmd:egp11()}, {cmd:esec()}, {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
-    you may additionally specify variables {it:sempl} and
+    With some translators you may additionally specify variables {it:sempl} and
     {it:supvis}. {it:sempl}!=0 indicates that a respondent is self-employed;
-    {it:supvis} provides the number of subordinates or employees. Omitted or missing
-    {it:sempl} will be treated as {it:sempl}=0; omitted, missing, or negative
-    {it:supvis} will be treated as {it:supvis}=0. The relevant distinctions
-    for {it:supvis} are as follows:
+    {it:supvis} indicates that a respondent has supervisory status and, possibly,
+    specifies the number of subordinates or employees. In general, omitted or missing
+    {it:sempl} will be treated as {it:sempl}=0 (unless noted otherwise), and omitted, missing, or negative
+    {it:supvis} will be treated as {it:supvis}=0. Details
+    are as follows:
 
-{pmore}
-    {opt egp()}/{cmd:egp11()} for ISCO-88: 0 vs. 1 vs. 2-9 vs. 10 or more subordinates or employees
+{phang}
+o {opt egp()} and {cmd:egp11()}
+    {p_end}
+{phang2}
+    - {cmd:from(isco88)}: relevant distinctions for {it:supvis} are 0 vs. 1 vs. 2-9 vs. 10 or more
+    {p_end}
+{phang2}
+    - {cmd:from(isco68)}: relevant distinctions for {it:supvis} are 0 vs. 1-9 vs. 10 or more
+    {p_end}
 
-{pmore}
-    {opt egp()}/{cmd:egp11()} for ISCO-68: 0 vs. 1-9 vs. 10 or more subordinates or employees
+{phang}
+o {opt esec()}
+    {p_end}
+{phang2}
+    - if {it:sempl}=0: the relevant distinction is {it:supvis}=0 (no supervisory status)
+    vs. {it:supvis}>0 (supervisory status); supervisors are employees
+    who have formal responsibility for supervising the work of other employees; if the data
+    does not contain a direct measure of supervisory status, the
+    {browse "https://www.iser.essex.ac.uk/archives/esec/user-guide":ESEC User Guide}
+    (section 4.7)
+    suggests coding employees as supervisors if they are supervising at least three people.
+    {p_end}
+{phang2}
+    - if {it:sempl}!=0: relevant distinctions for {it:supvis} are 0 vs. 1-9 vs. 10 or more
+    (although note that the resulting ESEC classes will be the same for 0 and 1-9)
+    {p_end}
+{phang2}
+    - {cmd:from(isco88)}: the "simplified" ESEC (see
+    {browse "https://www.iser.essex.ac.uk/archives/esec/user-guide":ESEC User Guide})
+    will be applied if {it:sempl} is omitted or missing
+    {p_end}
 
-{pmore}
-    {opt esec()}: 0 vs. 1 or more subordinates if {it:sempl}=0;
-    0-9 vs. 10 or more employees if {it:sempl}!=0
-
-{pmore}
-    {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}: irrelevant if {it:sempl}=0; 0 vs. 1-9 vs. 10 or
-    more employees if {it:sempl}!=0; helping family members can be coded as {it:sempl}!=0 with {it:supvis}=0
+{phang}
+o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
+    {p_end}
+{phang2}
+    - if {it:sempl}=0: {it:supvis} is ignored
+    {p_end}
+{phang2}
+    - if {it:sempl}!=0: relevant distinctions for {it:supvis} are 0 vs. 1-9 vs. 10 or
+    more
+    {p_end}
+{phang2}
+    - helping family members should be coded as {it:sempl}!=0 with {it:supvis}=0
 
 {marker lbl}{...}
 {pstd}
@@ -287,9 +318,9 @@
     information on the ESEC classification also see
     {browse "http://www.iser.essex.ac.uk/archives/esec"}. Note that ESEC is defined
     at the level of minor groups (3 digit) (i.e. all unit groups within a minor group
-    map into the same class). ISCO minor groups 960, 961, and 962 are missing in the ESEC 
-    list provided in {bf:esec_08_3_digit_public.xlsx}; {cmd:iscogen} uses the same ESEC values for
-    them as for minor group 950, 951, and 952.
+    map into the same class). ISCO minor groups 960, 961, and 962 are missing in the ESEC
+    list provided in {bf:esec_08_3_digit_public.xlsx}; {cmd:iscogen} applies the same ESEC classes as
+    for minor groups 950, 951, and 952.
 
 {phang}
     ISCO-08  ->  OESCH

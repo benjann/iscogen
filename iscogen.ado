@@ -1,4 +1,4 @@
-*! version 1.0.3  10apr2020  Ben Jann
+*! version 1.0.4  12apr2020  Ben Jann
 
 program iscogen
     version 13
@@ -70,22 +70,7 @@ program Recode, rclass
     gettoken isco   sempl  : varlist
     gettoken sempl  supvis : sempl
     gettoken supvis        : supvis
-    if inlist(substr("`to'",1,5), "egp", "egp11", "esec", "oesch") {
-        if "`sempl'"==""  di as txt "({it:sempl} not provided; assumed 0)"
-        else confirm numeric variable `sempl'
-        if "`supvis'"=="" di as txt "({it:supvis} not provided; assumed 0)"
-        else confirm numeric variable `supvis'
-    }
-    else {
-        if "`sempl'"!="" {
-            di as err "{it:sempl} not allowed with {bf:`to'()}"
-            exit 198
-        }
-        if "`supvis'"!="" {
-            di as err "{it:supvis} not allowed with {bf:`to'()}"
-            exit 198
-        }
-    }
+
     // - parse "[if] [in] [, options]"
     local 0 `"`rest'"'
     syntax [if] [in] [, From(str) String Replace noLabel INValid EMissing ]
@@ -107,6 +92,32 @@ program Recode, rclass
     if "`emissing'"!="" {
         if "`string'"!="" local emissing
         else if substr("`: type ``isco''",1,3)=="str" local emissing
+    }
+    if inlist(substr("`to'",1,5), "egp", "egp11", "esec", "oesch") {
+        if "`to'"=="esec" & "`from'"=="isco88" {
+            if "`sempl'"=="" di as txt "({it:sempl} not provided; applying simplified ESEC)"
+            else {
+                confirm numeric variable `sempl'
+                if "`supvis'"=="" di as txt "({it:supvis} not provided; assumed 0)"
+                else confirm numeric variable `supvis'
+            }
+        }
+        else {
+            if "`sempl'"==""  di as txt "({it:sempl} not provided; assumed 0)"
+            else confirm numeric variable `sempl'
+            if "`supvis'"=="" di as txt "({it:supvis} not provided; assumed 0)"
+            else confirm numeric variable `supvis'
+        }
+    }
+    else {
+        if "`sempl'"!="" {
+            di as err "{it:sempl} not allowed with {bf:`to'()}"
+            exit 198
+        }
+        if "`supvis'"!="" {
+            di as err "{it:supvis} not allowed with {bf:`to'()}"
+            exit 198
+        }
     }
     
     // mark sample
@@ -268,7 +279,14 @@ program _recode
     local ncols = 1 + 1
     if "`sempl'"!="" {
         qui count if `sempl'>=. & `touse'
-        if r(N) di as txt "({cmd:`sempl'} has missings; assumed 0)"
+        if r(N) {
+            if "`to'"=="esec" & "`from'"=="isco88" {
+                di as txt "({cmd:`sempl'} has missings; applying simplified ESEC to corresponding observations)"
+            }
+            else {
+                di as txt "({cmd:`sempl'} has missings; assumed 0)"
+            }
+        }
         if "`supvis'"!="" {
             qui count if `supvis'>=. & `touse'
             if r(N) di as txt "({cmd:`supvis'} has missings; assumed 0)"
@@ -276,15 +294,30 @@ program _recode
             if r(N) di as txt "({cmd:`supvis'} has negative values; assumed 0)"
         }
     }
-    if "`to'"=="esec" {
-        local ncols = 1 + 4
+    if "`to'"=="esec" & "`from'"=="isco88" {
+        local ncols = 1 + 6
         tempvar COL
-        qui gen byte `COL' = 1 if `touse'
+        qui gen byte `COL' = 6 if `touse' // simplified ESEC
         if "`sempl'"!="" {
-            qui replace `COL' = 3 if (`sempl'!=0) & (`sempl'<.) & `touse'
+            qui replace `COL' = 1 if (`sempl'==0) & `touse' // employees
+            qui replace `COL' = 3 if (`sempl'!=0) & (`sempl'<.) & `touse' // selfemp
             if "`supvis'"!="" {
-                qui replace `COL' = 2 if (`supvis'>=1)  & (`supvis'<.) & (`COL'==1) & `touse'
-                qui replace `COL' = 4 if (`supvis'>=10) & (`supvis'<.) & (`COL'==3) & `touse'
+                qui replace `COL' = 2 if (`supvis'>=1)  & (`supvis'<.)  & (`COL'==1) & `touse'
+                qui replace `COL' = 4 if (`supvis'>=1)  & (`supvis'<10) & (`COL'==3) & `touse'
+                qui replace `COL' = 5 if (`supvis'>=10) & (`supvis'<.)  & (`COL'==3) & `touse'
+            }
+        }
+    }
+    else if "`to'"=="esec" {
+        local ncols = 1 + 5
+        tempvar COL
+        qui gen byte `COL' = 1 if `touse'   // employees
+        if "`sempl'"!="" {
+            qui replace `COL' = 3 if (`sempl'!=0) & (`sempl'<.) & `touse' // selfemp
+            if "`supvis'"!="" {
+                qui replace `COL' = 2 if (`supvis'>=1)  & (`supvis'<.)  & (`COL'==1) & `touse'
+                qui replace `COL' = 4 if (`supvis'>=1)  & (`supvis'<10) & (`COL'==3) & `touse'
+                qui replace `COL' = 5 if (`supvis'>=10) & (`supvis'<.)  & (`COL'==3) & `touse'
             }
         }
     }
@@ -710,7 +743,7 @@ exit
 
 % CODELIST-isco68-isco88
 % source: isco6888.sps from http://www.harryganzeboom.nl/isco08/
-% note: aternative would be isco6888.sps from http://www.harryganzeboom.nl/isco68/; 
+% note: alternative would be isco6888.sps from http://www.harryganzeboom.nl/isco68/; 
 %       the version from .../isco08/ has some additional codes
 % note: using last mapping in case of duplicates (repeated mappings); this leads
 %       to differences to the source because in SPSS later mappings are ignored;
@@ -8887,164 +8920,165 @@ exit
 % CODELIST-isco88-esec
 % source: Euroesec matrix.xls obtained on 10apr2020 from 
 %         https://www.iser.essex.ac.uk/archives/esec/matrices-and-syntax
-% variables: ISCO-08(3 digit) ESEC(employee) ESEC(supervisor)
-%            ESEC(selfemp 0-9 employees) ESEC(selfemp 10+ employees)
-010 1 1 1 1
-011 3 2 3 3
-100 1 1 4 1
-110 1 1 1 1
-111 1 1 1 1
-114 1 1 1 1
-120 1 1 4 1
-121 1 1 4 1
-122 2 2 4 1
-123 1 1 4 1
-130 2 2 4 1
-131 2 2 4 1
-200 1 1 1 1
-210 1 1 1 1
-211 1 1 1 1
-212 1 1 1 1
-213 1 1 1 1
-214 1 1 1 1
-220 1 1 1 1
-221 1 1 1 1
-222 1 1 1 1
-223 2 2 2 1
-230 2 2 2 1
-231 1 1 1 1
-232 2 2 2 1
-233 2 2 2 1
-234 2 2 2 1
-235 1 1 1 1
-240 1 1 1 1
-241 1 1 1 1
-242 1 1 1 1
-243 2 2 2 1
-244 2 2 2 1
-245 2 2 2 1
-246 2 2 2 1
-247 2 2 2 1
-300 3 2 4 1
-310 2 2 2 1
-311 2 2 2 1
-312 2 2 2 1
-313 6 2 4 1
-314 2 2 2 1
-315 6 6 4 1
-320 2 2 2 1
-321 2 2 2 1
-322 2 2 2 1
-323 2 2 2 1
-330 3 2 4 1
-331 3 2 4 1
-332 3 2 4 1
-333 3 2 4 1
-334 2 2 2 1
-340 3 2 4 1
-341 3 2 4 1
-342 2 2 2 1
-343 3 2 4 1
-344 2 2 2 2
-345 2 2 2 2
-346 3 2 4 1
-347 3 2 4 1
-348 2 2 2 1
-400 3 2 4 1
-410 3 2 4 1
-411 3 2 4 1
-412 3 2 4 1
-413 7 6 4 1
-414 9 6 4 1
-419 3 2 4 1
-420 3 2 4 1
-421 7 6 4 1
-422 7 6 4 1
-500 7 6 4 1
-510 7 6 4 1
-511 7 6 4 1
-512 9 6 4 1
-513 7 6 4 1
-514 7 6 4 1
-516 7 6 3 3
-520 7 6 4 1
-521 2 2 4 1
-522 7 6 4 1
-600 8 6 5 1
-610 8 6 5 1
-611 8 6 5 1
-612 8 6 5 1
-613 8 6 5 1
-614 8 6 5 1
-615 8 6 5 1
-621 5 5 5 5
-700 8 6 4 1
-710 8 6 4 1
-711 8 6 4 1
-712 8 6 4 1
-713 8 6 4 1
-714 8 6 4 1
-720 8 6 4 1
-721 8 6 4 1
-722 8 6 4 1
-723 8 6 4 1
-724 8 6 4 1
-730 6 6 4 1
-731 6 6 4 1
-732 8 6 4 1
-733 8 6 4 1
-734 8 6 4 1
-740 8 6 4 1
-741 8 6 4 1
-742 8 6 4 1
-743 8 6 4 1
-744 8 6 4 1
-800 9 6 4 1
-810 9 6 4 1
-811 9 6 4 1
-812 9 6 4 1
-813 9 6 4 1
-814 9 6 4 1
-815 9 6 4 1
-816 9 6 4 1
-817 9 6 4 1
-820 9 6 4 1
-821 9 6 4 1
-822 9 6 4 1
-823 9 6 4 1
-824 9 6 4 1
-825 8 6 4 1
-826 9 6 4 1
-827 9 6 4 1
-828 9 6 4 1
-829 9 6 4 1
-830 9 6 4 1
-831 8 6 4 1
-832 9 6 4 1
-833 9 6 4 1
-834 8 6 4 1
-900 9 6 4 1
-910 9 6 4 1
-911 7 6 4 1
-912 9 6 4 1
-913 9 6 4 1
-914 9 6 4 1
-915 9 6 4 1
-916 9 6 4 1
-920 9 6 5 1
-921 9 6 5 1
-930 9 6 4 1
-931 9 6 4 1
-932 9 6 4 1
-933 9 6 4 1
+% variables: ISCO-88(3 digit) ESEC-employee ESEC-supervisor
+%            ESEC-selfemp(0) ESEC-selfemp(1-9) ESEC-selfemp(10+)
+%            ESEC-simplified
+010 1 1 1 1 1 1
+011 3 2 3 3 3 3
+100 1 1 4 4 1 1
+110 1 1 1 1 1 1
+111 1 1 1 1 1 1
+114 1 1 1 1 1 1
+120 1 1 4 4 1 1
+121 1 1 4 4 1 1
+122 2 2 4 4 1 2
+123 1 1 4 4 1 1
+130 2 2 4 4 1 4
+131 2 2 4 4 1 4
+200 1 1 1 1 1 1
+210 1 1 1 1 1 1
+211 1 1 1 1 1 1
+212 1 1 1 1 1 1
+213 1 1 1 1 1 1
+214 1 1 1 1 1 1
+220 1 1 1 1 1 1
+221 1 1 1 1 1 1
+222 1 1 1 1 1 1
+223 2 2 2 2 1 2
+230 2 2 2 2 1 2
+231 1 1 1 1 1 1
+232 2 2 2 2 1 2
+233 2 2 2 2 1 2
+234 2 2 2 2 1 2
+235 1 1 1 1 1 1
+240 1 1 1 1 1 1
+241 1 1 1 1 1 1
+242 1 1 1 1 1 1
+243 2 2 2 2 1 2
+244 2 2 2 2 1 2
+245 2 2 2 2 1 2
+246 2 2 2 2 1 2
+247 2 2 2 2 1 2
+300 3 2 4 4 1 3
+310 2 2 2 2 1 2
+311 2 2 2 2 1 2
+312 2 2 2 2 1 2
+313 6 2 4 4 1 6
+314 2 2 2 2 1 2
+315 6 6 4 4 1 6
+320 2 2 2 2 1 2
+321 2 2 2 2 1 2
+322 2 2 2 2 1 2
+323 2 2 2 2 1 2
+330 3 2 4 4 1 3
+331 3 2 4 4 1 3
+332 3 2 4 4 1 3
+333 3 2 4 4 1 3
+334 2 2 2 2 1 2
+340 3 2 4 4 1 3
+341 3 2 4 4 1 3
+342 2 2 2 2 1 2
+343 3 2 4 4 1 3
+344 2 2 2 2 2 2
+345 2 2 2 2 2 2
+346 3 2 4 4 1 3
+347 3 2 4 4 1 3
+348 2 2 2 2 1 2
+400 3 2 4 4 1 3
+410 3 2 4 4 1 3
+411 3 2 4 4 1 3
+412 3 2 4 4 1 3
+413 7 6 4 4 1 7
+414 9 6 4 4 1 9
+419 3 2 4 4 1 3
+420 3 2 4 4 1 3
+421 7 6 4 4 1 7
+422 7 6 4 4 1 7
+500 7 6 4 4 1 7
+510 7 6 4 4 1 7
+511 7 6 4 4 1 7
+512 9 6 4 4 1 9
+513 7 6 4 4 1 7
+514 7 6 4 4 1 7
+516 7 6 3 3 3 7
+520 7 6 4 4 1 7
+521 2 2 4 4 1 2
+522 7 6 4 4 1 7
+600 8 6 5 5 1 5
+610 8 6 5 5 1 5
+611 8 6 5 5 1 5
+612 8 6 5 5 1 5
+613 8 6 5 5 1 5
+614 8 6 5 5 1 8
+615 8 6 5 5 1 8
+621 5 5 5 5 5 5
+700 8 6 4 4 1 8
+710 8 6 4 4 1 8
+711 8 6 4 4 1 8
+712 8 6 4 4 1 8
+713 8 6 4 4 1 8
+714 8 6 4 4 1 8
+720 8 6 4 4 1 8
+721 8 6 4 4 1 8
+722 8 6 4 4 1 8
+723 8 6 4 4 1 8
+724 8 6 4 4 1 8
+730 6 6 4 4 1 6
+731 6 6 4 4 1 6
+732 8 6 4 4 1 8
+733 8 6 4 4 1 8
+734 8 6 4 4 1 8
+740 8 6 4 4 1 8
+741 8 6 4 4 1 8
+742 8 6 4 4 1 8
+743 8 6 4 4 1 8
+744 8 6 4 4 1 8
+800 9 6 4 4 1 9
+810 9 6 4 4 1 9
+811 9 6 4 4 1 9
+812 9 6 4 4 1 9
+813 9 6 4 4 1 9
+814 9 6 4 4 1 9
+815 9 6 4 4 1 9
+816 9 6 4 4 1 9
+817 9 6 4 4 1 9
+820 9 6 4 4 1 9
+821 9 6 4 4 1 9
+822 9 6 4 4 1 9
+823 9 6 4 4 1 9
+824 9 6 4 4 1 9
+825 8 6 4 4 1 8
+826 9 6 4 4 1 9
+827 9 6 4 4 1 9
+828 9 6 4 4 1 9
+829 9 6 4 4 1 9
+830 9 6 4 4 1 9
+831 8 6 4 4 1 8
+832 9 6 4 4 1 9
+833 9 6 4 4 1 9
+834 8 6 4 4 1 8
+900 9 6 4 4 1 9
+910 9 6 4 4 1 9
+911 7 6 4 4 1 4
+912 9 6 4 4 1 9
+913 9 6 4 4 1 9
+914 9 6 4 4 1 9
+915 9 6 4 4 1 9
+916 9 6 4 4 1 9
+920 9 6 5 5 1 9
+921 9 6 5 5 1 9
+930 9 6 4 4 1 9
+931 9 6 4 4 1 9
+932 9 6 4 4 1 9
+933 9 6 4 4 1 9
 % END
 
 % CODELIST-isco88-oesch
 % source: iskooesch.ado (May 2018) by Simon Kaiser
 % note: the codelist has been generated automatically by applying iskooesch.ado
 %       to all relevant combinations of isco codes, selfemployment, supervision
-% variables: ISCO-88 OESCH(employee) OESCH(selfemp 0 employees)
-%            OESCH(selfemp 1-9 employees) OESCH(selfemp 10+ employees)
+% variables: ISCO-88 OESCH-employee OESCH-selfemp(0) OESCH-selfemp(1-9)
+%            OESCH-selfemp(10+)
 1000 9 4 3 1
 1100 9 4 3 1
 1110 9 4 3 1
@@ -11381,198 +11415,200 @@ exit
 % CODELIST-isco08-esec
 % source: esec_08_3_digit_public.xlsx obtained on 27jun2019 from 
 %         https://ekharrison.weebly.com/european-socio-economic-classification-esec.html
-% note: codes 960/961/962 are not covered in the 3-digit list in esec_08_3_digit_public.xlsx; 
-%       however, from the 2-digit list (also in esec_08_3_digit_public.xlsx) we see
-%       that we can treat these codes in the same way as 950/951/952
-% variables: ISCO-08(3 digit) ESEC(employee) ESEC(supervisor)
-%            ESEC(selfemp 0-9 employees) ESEC(selfemp 10+ employees)
-011 1 1 1 1
-021 3 2 3 3
-031 3 2 3 3
-100 1 1 4 1
-110 1 1 1 1
-111 1 1 1 1
-112 1 1 1 1
-120 1 1 4 1
-121 1 1 4 1
-122 1 1 4 1
-130 1 1 4 1
-131 2 2 5 1
-132 2 2 4 1
-133 1 1 4 1
-134 1 1 4 1
-140 2 2 4 1
-141 2 2 4 1
-142 2 2 4 1
-143 2 2 4 1
-200 1 1 1 1
-210 1 1 1 1
-211 1 1 1 1
-212 1 1 1 1
-213 1 1 1 1
-214 1 1 1 1
-215 1 1 1 1
-216 1 1 1 1
-220 1 1 1 1
-221 1 1 1 1
-222 2 2 2 1
-223 2 2 2 1
-224 6 6 4 1
-225 1 1 1 1
-226 1 1 1 1
-230 1 1 1 1
-231 1 1 1 1
-232 1 1 1 1
-233 2 2 2 1
-234 2 2 2 1
-235 1 1 1 1
-240 1 1 1 1
-241 1 1 1 1
-242 2 2 2 1
-243 1 1 1 1
-250 1 1 1 1
-251 1 1 1 1
-252 2 2 2 1
-260 2 2 2 1
-261 1 1 1 1
-262 2 2 2 1
-263 1 1 1 1
-264 2 2 2 1
-265 2 2 2 1
-300 3 2 4 1
-310 2 2 2 1
-311 2 2 2 1
-312 2 2 2 1
-313 6 2 4 1
-314 2 2 2 1
-315 2 2 2 1
-320 6 6 4 1
-321 2 2 2 1
-322 2 2 2 1
-323 2 2 2 1
-324 3 6 4 1
-325 3 2 4 1
-330 1 1 1 1
-331 1 1 1 1
-332 1 1 1 1
-333 2 2 2 1
-334 3 2 4 1
-335 2 2 2 2
-340 3 2 4 1
-341 3 2 2 1
-342 3 2 4 1
-343 3 2 4 1
-350 3 2 4 1
-351 3 2 4 1
-352 3 2 4 1
-400 3 2 4 1
-410 3 2 4 1
-411 3 2 4 1
-412 3 2 4 1
-413 3 2 4 1
-420 7 6 4 1
-421 7 6 4 1
-422 7 6 4 1
-430 3 2 4 1
-431 3 2 4 1
-432 7 2 4 1
-440 3 6 4 1
-441 3 6 4 1
-500 7 6 4 1
-510 7 6 4 1
-511 7 6 4 1
-512 7 6 4 1
-513 7 6 4 1
-514 7 6 4 1
-515 7 6 4 1
-516 7 6 4 1
-520 7 6 4 1
-521 9 7 4 1
-522 7 6 4 1
-523 7 6 4 1
-524 7 6 4 1
-530 7 6 4 1
-531 7 6 4 1
-532 7 6 4 1
-540 7 6 3 3
-541 7 6 3 3
-600 8 6 5 1
-610 8 6 5 1
-611 8 6 5 1
-612 8 6 5 1
-613 8 6 5 1
-620 8 6 5 1
-621 8 6 5 1
-622 8 6 5 1
-630 5 5 5 5
-631 5 5 5 5
-632 5 5 5 5
-633 5 5 5 5
-634 5 5 5 5
-700 8 6 4 1
-710 8 6 4 1
-711 8 6 4 1
-712 8 6 4 1
-713 8 6 4 1
-720 8 6 4 1
-721 8 6 4 1
-722 8 6 4 1
-723 8 6 4 1
-730 8 6 4 1
-731 8 6 4 1
-732 8 6 4 1
-740 8 6 4 1
-741 8 6 4 1
-742 6 6 4 1
-750 8 6 4 1
-751 8 6 4 1
-752 8 6 4 1
-753 8 6 4 1
-754 8 6 4 1
-800 9 6 4 1
-810 9 6 4 1
-811 9 6 4 1
-812 9 6 4 1
-813 9 6 4 1
-814 9 6 4 1
-815 9 6 4 1
-816 9 6 4 1
-817 9 6 4 1
-818 9 6 4 1
-820 9 6 4 1
-821 9 6 4 1
-830 8 6 4 1
-831 8 6 4 1
-832 9 6 4 1
-833 8 6 4 1
-834 9 6 4 1
-835 8 6 4 1
-900 9 6 4 1
-910 9 6 4 1
-911 9 6 4 1
-912 9 6 4 1
-920 9 6 5 1
-921 9 6 5 1
-930 9 6 5 1
-931 9 6 4 1
-932 9 6 4 1
-933 9 6 4 1
-940 9 6 4 1
-941 9 6 4 1
-950 9 6 4 1
-951 9 6 4 1
-952 9 6 4 1
-960 9 6 4 1     (see note above)
-961 9 6 4 1     (see note above)
-962 9 6 4 1     (see note above)
+% note: codes 960/961/962 are not covered in the 3-digit list in 
+%       esec_08_3_digit_public.xlsx; because ESEC classes are the same for 95 
+%       and 96 in the 2-digit list (also in esec_08_3_digit_public.xlsx), codes
+%       960/961/962 are added to the list below using the same classes as for
+%       950/951/952
+% variables: ISCO-08(3 digit) ESEC-employee ESEC-supervisor
+%            ESEC-selfemp(0) ESEC-selfemp(1-9) ESEC-selfemp(10+)
+011 1 1 1 1 1
+021 3 2 3 3 3
+031 3 2 3 3 3
+100 1 1 4 4 1
+110 1 1 1 1 1
+111 1 1 1 1 1
+112 1 1 1 1 1
+120 1 1 4 4 1
+121 1 1 4 4 1
+122 1 1 4 4 1
+130 1 1 4 4 1
+131 2 2 5 5 1
+132 2 2 4 4 1
+133 1 1 4 4 1
+134 1 1 4 4 1
+140 2 2 4 4 1
+141 2 2 4 4 1
+142 2 2 4 4 1
+143 2 2 4 4 1
+200 1 1 1 1 1
+210 1 1 1 1 1
+211 1 1 1 1 1
+212 1 1 1 1 1
+213 1 1 1 1 1
+214 1 1 1 1 1
+215 1 1 1 1 1
+216 1 1 1 1 1
+220 1 1 1 1 1
+221 1 1 1 1 1
+222 2 2 2 2 1
+223 2 2 2 2 1
+224 6 6 4 4 1
+225 1 1 1 1 1
+226 1 1 1 1 1
+230 1 1 1 1 1
+231 1 1 1 1 1
+232 1 1 1 1 1
+233 2 2 2 2 1
+234 2 2 2 2 1
+235 1 1 1 1 1
+240 1 1 1 1 1
+241 1 1 1 1 1
+242 2 2 2 2 1
+243 1 1 1 1 1
+250 1 1 1 1 1
+251 1 1 1 1 1
+252 2 2 2 2 1
+260 2 2 2 2 1
+261 1 1 1 1 1
+262 2 2 2 2 1
+263 1 1 1 1 1
+264 2 2 2 2 1
+265 2 2 2 2 1
+300 3 2 4 4 1
+310 2 2 2 2 1
+311 2 2 2 2 1
+312 2 2 2 2 1
+313 6 2 4 4 1
+314 2 2 2 2 1
+315 2 2 2 2 1
+320 6 6 4 4 1
+321 2 2 2 2 1
+322 2 2 2 2 1
+323 2 2 2 2 1
+324 3 6 4 4 1
+325 3 2 4 4 1
+330 1 1 1 1 1
+331 1 1 1 1 1
+332 1 1 1 1 1
+333 2 2 2 2 1
+334 3 2 4 4 1
+335 2 2 2 2 2
+340 3 2 4 4 1
+341 3 2 2 2 1
+342 3 2 4 4 1
+343 3 2 4 4 1
+350 3 2 4 4 1
+351 3 2 4 4 1
+352 3 2 4 4 1
+400 3 2 4 4 1
+410 3 2 4 4 1
+411 3 2 4 4 1
+412 3 2 4 4 1
+413 3 2 4 4 1
+420 7 6 4 4 1
+421 7 6 4 4 1
+422 7 6 4 4 1
+430 3 2 4 4 1
+431 3 2 4 4 1
+432 7 2 4 4 1
+440 3 6 4 4 1
+441 3 6 4 4 1
+500 7 6 4 4 1
+510 7 6 4 4 1
+511 7 6 4 4 1
+512 7 6 4 4 1
+513 7 6 4 4 1
+514 7 6 4 4 1
+515 7 6 4 4 1
+516 7 6 4 4 1
+520 7 6 4 4 1
+521 9 7 4 4 1
+522 7 6 4 4 1
+523 7 6 4 4 1
+524 7 6 4 4 1
+530 7 6 4 4 1
+531 7 6 4 4 1
+532 7 6 4 4 1
+540 7 6 3 3 3
+541 7 6 3 3 3
+600 8 6 5 5 1
+610 8 6 5 5 1
+611 8 6 5 5 1
+612 8 6 5 5 1
+613 8 6 5 5 1
+620 8 6 5 5 1
+621 8 6 5 5 1
+622 8 6 5 5 1
+630 5 5 5 5 5
+631 5 5 5 5 5
+632 5 5 5 5 5
+633 5 5 5 5 5
+634 5 5 5 5 5
+700 8 6 4 4 1
+710 8 6 4 4 1
+711 8 6 4 4 1
+712 8 6 4 4 1
+713 8 6 4 4 1
+720 8 6 4 4 1
+721 8 6 4 4 1
+722 8 6 4 4 1
+723 8 6 4 4 1
+730 8 6 4 4 1
+731 8 6 4 4 1
+732 8 6 4 4 1
+740 8 6 4 4 1
+741 8 6 4 4 1
+742 6 6 4 4 1
+750 8 6 4 4 1
+751 8 6 4 4 1
+752 8 6 4 4 1
+753 8 6 4 4 1
+754 8 6 4 4 1
+800 9 6 4 4 1
+810 9 6 4 4 1
+811 9 6 4 4 1
+812 9 6 4 4 1
+813 9 6 4 4 1
+814 9 6 4 4 1
+815 9 6 4 4 1
+816 9 6 4 4 1
+817 9 6 4 4 1
+818 9 6 4 4 1
+820 9 6 4 4 1
+821 9 6 4 4 1
+830 8 6 4 4 1
+831 8 6 4 4 1
+832 9 6 4 4 1
+833 8 6 4 4 1
+834 9 6 4 4 1
+835 8 6 4 4 1
+900 9 6 4 4 1
+910 9 6 4 4 1
+911 9 6 4 4 1
+912 9 6 4 4 1
+920 9 6 5 5 1
+921 9 6 5 5 1
+930 9 6 5 5 1
+931 9 6 4 4 1
+932 9 6 4 4 1
+933 9 6 4 4 1
+940 9 6 4 4 1
+941 9 6 4 4 1
+950 9 6 4 4 1
+951 9 6 4 4 1
+952 9 6 4 4 1
+960 9 6 4 4 1  % see note above
+961 9 6 4 4 1  % see note above
+962 9 6 4 4 1  % see note above
 % END
 
 % CODELIST-isco08-oesch
 % source: iscooesch.ado (May 2018) by Simon Kaiser
 % note: the codelist has been generated automatically by applying iskooesch.ado
 %       to all relevant combinations of isco codes, selfemployment, supervision
-% variables: ISCO-88 OESCH(employee) OESCH(selfemp 0 employees)
-%            OESCH(selfemp 1-9 employees) OESCH(selfemp 10+ employees)
+% variables: ISCO-88 OESCH-employee OESCH-selfemp(0) OESCH-selfemp(1-9)
+%            OESCH-selfemp(10+)
 0100 9 . . 1
 0110 9 . . 1
 0200 10 . . 1
