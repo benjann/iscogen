@@ -20,7 +20,7 @@ in Stata. Stata version 13 or newer is required.
 
 Installation from GitHub:
 
-    . net install mindex, from(https://raw.githubusercontent.com/benjann/iscogen/master/)
+    . net install iscogen, from(https://raw.githubusercontent.com/benjann/iscogen/master/)
 
 ---
 
