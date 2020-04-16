@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.3  12apr2020  Ben Jann}{...}
+{* *! version 1.0.5  16apr2020  Ben Jann}{...}
 {vieweralsosee "[D] generate" "help generate"}{...}
 {vieweralsosee "[D] label" "help label"}{...}
 {viewerjumpto "Syntax" "iscogen##syntax"}{...}
@@ -50,6 +50,8 @@
 {p2col:{opt isco08()}}generate 4-digit ISCO-08 codes
     {p_end}
 {p2col:{opt isco88()}}generate 4-digit ISCO-88 codes
+    {p_end}
+{p2col:{opt isco88com()}}generate 4-digit ISCO-88(COM) codes
     {p_end}
 {p2col:{opt isco68()}}generate 4-digit ISCO-68 codes
     {p_end}
@@ -106,12 +108,15 @@
 
 {p2col:ISCO-88 ->}major (1 digit), submajor (2 digit), minor (3 digit) groups{p_end}
 {p2col:ISCO-88 ->}ISCO-08{p_end}
+{p2col:ISCO-88 ->}ISCO-88(COM) (European Union variant of the ISCO-88){p_end}
 {p2col:ISCO-88 ->}ISCO-68{p_end}
 {p2col:ISCO-88 ->}ISEI (International Socio-economic Index of Occupational Status; Ganzeboom et al. 1992){p_end}
 {p2col:ISCO-88 ->}SIOPS (Standard International Occupational Prestige Scale; Treiman 1977){p_end}
 {p2col:ISCO-88 ->}MPS (German Magnitude Prestige Scale; Christoph 2005){p_end}
 {p2col:ISCO-88 ->}EGP classes (Erikson et al. 1979, 1983){p_end}
 {p2col:ISCO-88 ->}ESEC (European Socio-economic Classification; Harrison/Rose 2006){p_end}
+{p2col:}{space 2}Note: ESEC is based on ISCO-88(COM); consider converting ISCO-88 to ISCO-88(COM) before
+    translating to ESEC{p_end}
 {p2col:ISCO-88 ->}OESCH classes (16, 8 or 5 classes; Oesch 2006a,b){p_end}
 
 {p2col:ISCO-68 ->}ISCO-08{p_end}
@@ -349,6 +354,26 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     {browse "http://www.harryganzeboom.nl/isco08/"}.
 
 {phang}
+    ISCO-88  ->  ISCO-08(COM)
+    {p_end}
+{pmore}
+    Translation based on Appendix 7.12 in
+    {browse "http://www.gesis.org/fileadmin/upload/dienstleistung/tools_standards/handbuch_der_berufscodierung_110304.pdf":Geis (2011)}, covering
+    the {browse "http://www.ilo.org/public/english/bureau/stat/isco/isco88/major.htm":ISCO-88}
+    codes provided by the ILO. The
+    {browse "http://warwick.ac.uk/fac/soc/ier/research/classification/isco88":ISCO-88(COM)}
+    is the European Union variant of the ISCO-88. A number
+    of ISCO-88 codes do not exist in the ISCO-88(COM)
+    (0110, 1120, 1130, 2132, 3240, 3241, 3242, 3439, 5150, 5151, 5152, 5230,
+    6113, 6114, 6123, 6124, 6200, 6210, 7142, 7243, 8171, 8172, 9112, 9321,
+    9322, 9331, 9332, 9333) or have a different meaning (6112). These codes are remapped
+    as suggested by Geis (2011). Note that the ISCO-88(COM) also has three additional
+    codes (2470, 7139, 8287); these codes have no counterpart in the ISCO-88 and, hence,
+    will be left empty by the translator. Furthermore, a number of
+    ISCO-88(COM) labels are somewhat different from the ISCO-88 labels; the translator will
+    assign the ISCO-88(COM) labels in these cases.
+
+{phang}
     ISCO-88  ->  ISCO-68
     {p_end}
 {pmore}
@@ -424,7 +449,11 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     from
     {browse "http://www.iser.essex.ac.uk/archives/esec"}. Note that ESEC is defined
     at the level of minor groups (3 digit) (i.e. all unit groups within a minor group
-    map into the same class).
+    map into the same class). Furthermore, note that the ESEC translator is
+    based on the {browse "http://warwick.ac.uk/fac/soc/ier/research/classification/isco88":ISCO-88(COM)},
+    the European Union variant of the ISCO-88. If your data contains ISCO-88 codes
+    you might want to translate these codes to ISCO-88(COM) using
+    {cmd:isco88com()} before applying {cmd:esec()}.
 
 {phang}
     ISCO-88  ->  OESCH
@@ -703,6 +732,10 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     Ganzeboom, H.B.G., D.J. Treiman. 1996. Internationally Comparable Measures
     of Occupational Status for the 1988 International Standard Classification
     of Occupations. Social Science Research 25: 201-239.
+    {p_end}
+{phang}
+    Geis, Alfons (2011). Handbuch für die Berufsvercodung. Stand: März 2011. Mannheim: GESIS. Available
+    from {browse "http://www.gesis.org/fileadmin/upload/dienstleistung/tools_standards/handbuch_der_berufscodierung_110304.pdf"}.
     {p_end}
 {phang}
     Harrison, E., D. Rose. 2006. The European Socio-economic Classification
