@@ -10,7 +10,8 @@
 {viewerjumpto "Stored results" "iscogen##stored"}{...}
 {viewerjumpto "References" "iscogen##references"}{...}
 {viewerjumpto "Author" "iscogen##author"}{...}
-{hi:help iscogen}
+{hi:help iscogen}{...}
+{right:{browse "http://github.com/benjann/iscogen/"}}
 {hline}
 
 {title:Title}
