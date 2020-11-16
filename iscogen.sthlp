@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.5  16apr2020  Ben Jann}{...}
+{* *! version 1.0.7  16nov2020  Ben Jann}{...}
 {vieweralsosee "[D] generate" "help generate"}{...}
 {vieweralsosee "[D] label" "help label"}{...}
 {viewerjumpto "Syntax" "iscogen##syntax"}{...}
@@ -31,7 +31,7 @@
     [{cmd:,}
     {cmdab:f:rom(}{help iscogen##from:{it:from}}{cmd:)}
     {opt r:eplace}
-    {opt em:isssing}
+    {opt em:issing}
     {opt s:tring}
     {opt nol:abel}
     {opt inv:alid}
@@ -56,6 +56,8 @@
 {p2col:{opt isco68()}}generate 4-digit ISCO-68 codes
     {p_end}
 {p2col:{opt isei()}}generate ISEI scores
+    {p_end}
+{p2col:{opt iseisps()}}{help iscogen##isei08:alternative ISEI scores} for ISCO08
     {p_end}
 {p2col:{opt siops()}}generate SIOPS scores
     {p_end}
@@ -298,13 +300,22 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     used in cases where the source contains repeated mappings; this is consistent
     with the source since repeated mappings are ignored by the used SPSS command.
 
+{marker isei08}{...}
 {phang}
     ISCO-08  ->  ISEI
     {p_end}
+{phang2}
+    {opt isei()}: File {bf:{browse "http://www.harryganzeboom.nl/isco08/isco08_with_isei.pdf":isco08_with_isei.pdf}}
+    (Ganzeboom 2010) provided by Harry Ganzeboom at {browse "http://www.harryganzeboom.nl/isco08/"}.
+    {p_end}
+{phang2}
+    {opt iseisps()}: SPSS script {cmd:isqoisei08.sps} provided by Harry Ganzeboom at
+    {browse "http://www.harryganzeboom.nl/isco08/"}.
+    {p_end}
 {pmore}
-    File {bf:{browse "http://www.harryganzeboom.nl/isco08/isco08_with_isei.pdf":isco08_with_isei.pdf}}
-    (Ganzeboom 2010) provided by Harry
-    Ganzeboom at {browse "http://www.harryganzeboom.nl/isco08/"}.
+    The two variants lead to somewhat different results (correlation of about 0.95
+    across occupational titles). It does not seem to be
+    clear whether {cmd:isei()} or {cmd:iseisps()} is to be preferred. 
 
 {phang}
     ISCO-08  ->  SIOPS

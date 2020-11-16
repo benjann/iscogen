@@ -1,9 +1,9 @@
 v 3
-d iscogen: module to translate ISCO codes
+d iscogen
 d 
 d Author: Ben Jann, University of Bern, ben.jann@soz.unibe.ch
 d
-d Distribution-Date: 20200416
+d Distribution-Date: 20201116
 f iscogen.ado
 f iscogen.sthlp
 f iscolbl.sthlp

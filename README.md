@@ -20,12 +20,19 @@ in Stata. Stata version 13 or newer is required.
 
 Installation from GitHub:
 
-    . net install iscogen, from(https://raw.githubusercontent.com/benjann/iscogen/master/)
+    . net install iscogen, replace from(https://raw.githubusercontent.com/benjann/iscogen/master/)
 
 ---
 
 Main changes:
 
+    16nov2020
+    - iseisps() added to translate ISCO08 to ISEI based on isqoisei08.sps from
+      H. Ganzeboom's website; this is an alternative to the default isei()
+      translator, which is based on isco08_with_isei.pdf from the same website.
+      The two translators lead to somewhat different results; it is unclear to
+      me which one is "better".
+    
     16apr2020
     - added an ISCO-88 to ISCO-88(COM) translator
     
