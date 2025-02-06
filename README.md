@@ -1,6 +1,9 @@
 # iscogen
 Stata module to translate ISCO codes
 
+> [!NOTE]
+> New command [`crosswalk`](https://github.com/benjann/crosswalk) makes `iscogen` obsolete.
+
 `iscogen` is a Stata command to translate ISCO codes (International
 Standard Classification of Occupations). Various transformations such as 
 recoding between ISCO-08, ISCO-88, and ISCO-68 or generating prestige scores 

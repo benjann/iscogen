@@ -1,2 +1,2 @@
 v 3
-p iscogen
+p iscogen module to translate ISCO codes

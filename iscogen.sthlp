@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.7  16nov2020  Ben Jann}{...}
+{* *! version 1.0.8  06feb2025  Ben Jann}{...}
 {vieweralsosee "[D] generate" "help generate"}{...}
 {vieweralsosee "[D] label" "help label"}{...}
 {viewerjumpto "Syntax" "iscogen##syntax"}{...}
@@ -18,6 +18,12 @@
 
 {pstd}{hi:iscogen} {hline 2} Utility to translate ISCO codes
 
+{hline}
+{p 2 2 2}
+    Note: New command {helpb crosswalk} makes {cmd:iscogen} obsolete; see
+    {net "describe crosswalk, from(http://fmwww.bc.edu/RePEc/bocode/c)":ssc describe crosswalk}.
+    {p_end}
+{hline}
 
 {marker syntax}{...}
 {title:Syntax}
@@ -414,7 +420,7 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     ISCO-88  ->  SIOPS
     {p_end}
 {pmore}
-    File {bf:{browse "http://www.harryganzeboom.nl/ismf/scaleapp.htm":bernhard2005.xlsx}}
+    File {bf:{browse "http://www.harryganzeboom.nl/ismf/scaleapp.htm":scaleapp.htm}}
     provided by Harry Ganzeboom at {browse "http://www.harryganzeboom.nl/isco88/"} (equivalent
     to the Appendix in Ganzeboom/Treiman 1996). The mapping is consistent with Stata
     script {cmd:iskotrei.ado} (version 1.0 15jun2001) by
@@ -552,7 +558,7 @@ o {cmd:oesch()}, {cmd:oesch8()}, and {cmd:oesch5()}
     ISCO-08 labels
     {p_end}
 {pmore}
-    File {bf:{browse "http://www.ilo.org/public/english/bureau/stat/isco/docs/groupdefn08.docx":structure08.docx}}
+    File {bf:{browse "http://www.ilo.org/public/english/bureau/stat/isco/docs/structure08.docx":structure08.docx}}
     provided by the ILO at {browse "http://www.ilo.org/public/english/bureau/stat/isco/isco08/"}. The
     source uses titlecase spelling; this has been changed to lowercase spelling.
 
